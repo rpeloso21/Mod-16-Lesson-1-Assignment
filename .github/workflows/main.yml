@@ -2,7 +2,7 @@ name: Flask CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feature/tests]
 
 jobs:
   build:
@@ -32,5 +32,34 @@ jobs:
           echo "Working Directory: $(pwd)"
           echo "Contents of Working Directory: $(1s -1)"
           echo "Contents of site-packages: $(1s -1 venv/lib/python*/site-packages)"
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with: 
+          python-version: 3.12
+
+      - name: Create virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run tests with pytest
+        run: |
+          python -m pytest tests/test_mock.py
+
+      - name: Run tests with unittest
+        run: python -m unittest discover -s tests -p 'test_*.py'
 
 
